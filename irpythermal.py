@@ -109,6 +109,12 @@ class Camera:
         """Find a supported thermal camera
 
         Optionally narrow down the resultion of the camera too look for."""
+        if platform == "darwin":
+            # OpenCV's AVFoundation backend cannot deliver raw YUYV frames or send
+            # CAP_PROP_ZOOM commands, so use the AVFoundation + IOKit backend instead.
+            from macos_capture import MacVideoCapture
+
+            return MacVideoCapture.find()
         for i in range(10):
             try:
                 if platform.startswith("linux"):

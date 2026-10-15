@@ -53,7 +53,11 @@ def parse_arguments() -> argparse.Namespace:
         "-r", "--rawcam", action="store_true", help="use the raw camera"
     )
     parser.add_argument(
-        "-d", "--device", type=str, help="use the camera at camera_path"
+        "-d",
+        "--device",
+        type=str,
+        help="use the camera at camera_path (Linux: /dev/videoN; macOS: AVFoundation "
+        "device index or name substring, see `python macos_capture.py`)",
     )
     parser.add_argument(
         "-o",
@@ -127,7 +131,12 @@ class AppState:
                 camera_kwargs["camera_raw"] = True
             if args.device:
                 camera_path = args.device
-                cv2_cam = cv2.VideoCapture(camera_path)
+                if sys.platform == "darwin":
+                    from macos_capture import MacVideoCapture
+
+                    cv2_cam = MacVideoCapture(device=camera_path)
+                else:
+                    cv2_cam = cv2.VideoCapture(camera_path)
                 camera_kwargs["video_dev"] = cv2_cam
             if args.offset:
                 camera_kwargs["fixed_offset"] = args.offset

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
+import sys
 import time
+
 import irpythermal
 
 # create camera object and do a initial calibration
-cap = irpythermal.HT301()
+# pass -r for cameras that send raw sensor data (e.g. Xtherm T2S+ V2)
+cap = irpythermal.Camera(camera_raw="-r" in sys.argv)
 
 # read frame (raw ADC data)
 ret, frame = cap.read()

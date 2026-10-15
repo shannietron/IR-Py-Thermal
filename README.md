@@ -10,6 +10,33 @@ It's a very simple hacked together lib, might be useful for somebody,
 uses `matplotlib` which is a little bit on the slow side,
 or pure `opencv` - much faster but without most features
 
+### Running on macOS
+
+Tested on macOS 26 (Apple Silicon) with an Xtherm T2S Pro (256x192, raw mode). OpenCV's
+AVFoundation backend ignores `CAP_PROP_CONVERT_RGB` and `CAP_PROP_ZOOM`, which this library
+needs for raw 16-bit frames and camera commands, and libusb needs root on current macOS.
+On macOS frames therefore come from AVFoundation (PyObjC) and commands go through a small
+IOKit helper in `macos/`; see `macos_capture.py`. The Linux path is unchanged.
+
+Requirements: Xcode Command Line Tools (`xcode-select --install`) and [uv](https://docs.astral.sh/uv/).
+
+```
+uv sync                         # Python 3.12 venv with opencv, matplotlib, pyobjc, ...
+make -C macos                   # builds macos/libuvcctl.dylib (UVC command helper)
+uv run python pyplot.py -r      # viewer; -r for raw-data cameras (T2S Pro / T2S+ V2)
+```
+
+Allow the camera permission prompt on first run. To check the camera:
+
+```
+uv run python macos_capture.py          # list video devices and formats (expect 256x196 yuvs)
+uv run python macos_capture.py --test   # grab frames from the thermal camera, print stats
+./macos/uvcctl_cli set 0x8000           # trigger the shutter
+```
+
+Notes: `-d` takes an AVFoundation device index or name substring, not a `/dev/video*` path.
+Serial ports are `/dev/cu.usbmodem*` / `/dev/cu.usbserial*`. Lock-in mode is not yet tested on macOS.
+
 Upon startup the app automatically looks for supported cameras by matching the resolutions.
 
 Running `python ./pyplot.py` will start the camera stream and show the controls below:

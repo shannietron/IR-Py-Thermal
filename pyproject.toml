@@ -1,24 +1,25 @@
-[tool.poetry]
+[project]
 name = "ir-py-thermal"
 version = "0.1.0"
-description = "ir-py-thermal"
-authors = ["Dima <me@dmytroengineering.com>"]
-repository = "https://github.com/diminDDL/IR-Py-Thermal"
+description = "Python thermal camera library for Xtherm / HT-301 / InfiRay cameras"
 readme = "README.md"
-package-mode = false
+requires-python = ">=3.10"
+dependencies = [
+    "opencv-python>=4.10,<5",
+    "numpy>=1.26",
+    "matplotlib>=3.9",
+    "pyserial>=3.5",
+    # macOS: AVFoundation capture path (see macos_capture.py)
+    "pyobjc-framework-AVFoundation>=10; sys_platform == 'darwin'",
+    "pyobjc-framework-Quartz>=10; sys_platform == 'darwin'",
+    "pyobjc-framework-libdispatch>=10; sys_platform == 'darwin'",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10.4"
-opencv-python = "^4.10.0.84"
-matplotlib = "^3.9.2"
-pyserial = "^3.5"
+[dependency-groups]
+dev = ["ruff>=0.7"]
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.7.3"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv]
+package = false
 
 [tool.ruff.lint]
 select = ["ALL"]
